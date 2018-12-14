@@ -28,25 +28,28 @@
             "metadata": {
                 "description": "Public SSH key for the Virtual Machine. Will be used only if authenticationType is 'sshPublicKey'"
             },
-            "defaultValue": "",
+            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAGLqLBJtraRrQUUceXgCz6rMBMUhEZ0Zvdv0WRrTWWotDWV/4DSmuiGES0e3KS/quMZ6AnaWc91iRqsuXpKXB+RkWEbhUHMg9nsjPvSR1bC5n8/KErRhgWevlCHhurA3inUotSZA0b92zPIk+URvpKbuZfrFXf5yEbctBmXY2hudSDDJX2RvDsPyOyr4/dLkBrzUDdEydYC183DkdiSs49v3bmUDy0WPeIFL2ziCyIoHci/GG1+gkTssdHeVazPWwLweW/6T02EGmAI2dqe6DceQ7+AC5N+Es/rLMxl17ban6gewMz6umSktoMqhT0MCmBFY9TnWbDqJWIW908q1N",
             "type": "string"
         },
         "adminUserName": {
             "metadata": {
                 "description": "User name for the Virtual Machine"
             },
+            "defaultValue": "jenkinsadmin",
             "type": "string"
         },
         "authenticationType": {
             "metadata": {
                 "description": "Authentication type (can be 'password' or 'sshPublicKey')"
             },
+            "defaultValue": "sshPublicKey",
             "type": "string"
         },
         "dnsPrefix": {
             "metadata": {
                 "description": "Unique DNS Name for the Public IP used to access the Jenkins Virtual Machine."
             },
+            "defaultValue": "jenkins-vm",
             "type": "string"
         },
         "enableCloudAgents": {
@@ -74,15 +77,15 @@
             "metadata": {
                 "description": "Public IP name"
             },
-            "type": "string",
-            "defaultValue": "jenkins-pip"
+            "defaultValue": "jenkins-ip",
+            "type": "string"
         },
         "publicIPNewOrExisting": {
             "metadata": {
                 "description": "Should be 'new' if the public IP has to be created"
             },
-            "type": "string",
-            "defaultValue": "new"
+            "defaultValue": "new",
+            "type": "string"
         },
         "publicIPResourceGroup": {
             "metadata": {
@@ -92,10 +95,10 @@
             "defaultValue": "[resourceGroup().name]"
         },
         "storageAccountType": {
-            "defaultValue": "Standard_LRS",
             "metadata": {
                 "description": "Storage Account Type"
             },
+            "defaultValue": "Standard_LRS",
             "type": "string"
         },
         "spId": {
@@ -124,7 +127,7 @@
                 "description": "Virtual Machine Name (also used as a prefix for other resources)"
             },
             "type": "string",
-            "defaultValue": "jenkins"
+            "defaultValue": "jenkinsvm"
         },
         "vmSize": {
             "metadata": {
