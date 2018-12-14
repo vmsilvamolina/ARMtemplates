@@ -127,7 +127,7 @@
                 "description": "Virtual Machine Name (also used as a prefix for other resources)"
             },
             "type": "string",
-            "defaultValue": "jenkinsvm"
+            "defaultValue": "jenkins-vm"
         },
         "vmSize": {
             "metadata": {
