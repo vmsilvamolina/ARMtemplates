@@ -28,7 +28,7 @@
             "metadata": {
                 "description": "Public SSH key for the Virtual Machine. Will be used only if authenticationType is 'sshPublicKey'"
             },
-            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAGLqLBJtraRrQUUceXgCz6rMBMUhEZ0Zvdv0WRrTWWotDWV/4DSmuiGES0e3KS/quMZ6AnaWc91iRqsuXpKXB+RkWEbhUHMg9nsjPvSR1bC5n8/KErRhgWevlCHhurA3inUotSZA0b92zPIk+URvpKbuZfrFXf5yEbctBmXY2hudSDDJX2RvDsPyOyr4/dLkBrzUDdEydYC183DkdiSs49v3bmUDy0WPeIFL2ziCyIoHci/GG1+gkTssdHeVazPWwLweW/6T02EGmAI2dqe6DceQ7+AC5N+Es/rLMxl17ban6gewMz6umSktoMqhT0MCmBFY9TnWbDqJWIW908q1N",
+            "defaultValue": "",
             "type": "string"
         },
         "adminUserName": {
@@ -49,7 +49,7 @@
             "metadata": {
                 "description": "Unique DNS Name for the Public IP used to access the Jenkins Virtual Machine."
             },
-            "defaultValue": "jenkins-vm",
+            "defaultValue": "vm-jenkins",
             "type": "string"
         },
         "enableCloudAgents": {
@@ -127,7 +127,7 @@
                 "description": "Virtual Machine Name (also used as a prefix for other resources)"
             },
             "type": "string",
-            "defaultValue": "jenkins-vm"
+            "defaultValue": "vm-jenkins"
         },
         "vmSize": {
             "metadata": {
