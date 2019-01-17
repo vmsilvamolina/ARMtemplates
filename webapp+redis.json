@@ -1,0 +1,70 @@
+{
+    "apiVersion": "2015-08-01",
+    "name": "[variables('apiSiteName')]",
+    "type": "Microsoft.Web/sites",
+    "location": "[resourceGroup().location]",
+    "dependsOn": [
+        "[resourceId('Microsoft.Cache/Redis/', variables('RedisCache').Name)]",
+        "[resourceId('Microsoft.Search/searchServices/', variables('searchAppName'))]",
+        "[resourceId('Microsoft.Cdn/profiles/', variables('profileName'))]",
+        "[resourceId('Microsoft.Web/serverFarms/', parameters('apiHostingPlanName'))]"
+    ],
+    "tags": {
+        "displayName": "Web / API"
+    },
+    "properties": {
+        "name": "[variables('apiSiteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('apiHostingPlanName'))]",
+        "clientAffinityEnabled": false
+    },
+    "resources": [{
+            "apiVersion": "2015-08-01",
+            "type": "config",
+            "name": "connectionstrings",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/', variables('apiSiteName'))]"
+            ],
+            "properties": {
+                "masterdata": {
+                    "value": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('databaseName'), ';User Id=', parameters('administratorLogin'), '@', variables('sqlserverName'), ';Password=', parameters('administratorLoginPassword'), ';')]",
+                    "type": "SQLServer"
+                },
+                "redis": {
+                    "value": "[concat(reference(resourceId('Microsoft.Cache/Redis', variables('RedisCache').Name)).hostName, variables('RedisCache').WebAppRedisSettingText, listKeys(resourceId('Microsoft.Cache/Redis', variables('RedisCache').Name), '2015-08-01').primaryKey)]",
+                    "type": "Custom"
+                }
+            }
+        },
+        {
+            "apiVersion": "2015-08-01",
+            "type": "config",
+            "name": "appsettings",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/', variables('apiSiteName'))]"
+            ],
+            "properties": {
+                "Redis:InstanceName": "[variables('cacheInstanceName')]",
+                "ApplicationInsights:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+                "Search:ServiceName": "[variables('searchAppName')]",
+                "Search:Key": "[listAdminKeys(resourceId('Microsoft.Search/searchServices/', variables('searchAppName')), '2015-08-19').primaryKey]",
+                "Storage:AccountName": "[variables('storageName')]",
+                "Storage:AccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2015-06-15').key1]",
+                "CDN:Hostname": "[reference(resourceId('Microsoft.Cdn/profiles/endpoints',variables('profileName'),variables('endpointName')),'2016-04-02').hostName]"
+            }
+        },
+        {
+            "apiVersion": "2015-08-01",
+            "type": "config",
+            "name": "web",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/', variables('apiSiteName'))]"
+            ],
+            "properties": {
+                "use32BitWorkerProcess": false,
+                "alwaysOn": true,
+                "phpVersion": "",
+                "defaultDocuments": []
+            }
+        }
+    ]
+}
