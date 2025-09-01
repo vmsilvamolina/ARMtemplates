@@ -46,6 +46,37 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01' = {
   }
 }
 
+// Microsoft Defender for SQL: prerequisito de la evaluación de vulnerabilidades.
+resource defenderForSql 'Microsoft.Sql/servers/securityAlertPolicies@2023-08-01' = {
+  parent: sqlServer
+  name: 'Default'
+  properties: {
+    state: 'Enabled'
+  }
+}
+
+// Evaluación de vulnerabilidades sin cuenta de storage (configuración exprés).
+resource vulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2023-08-01' = {
+  parent: sqlServer
+  name: 'Default'
+  properties: {
+    state: 'Enabled'
+  }
+  dependsOn: [
+    defenderForSql
+  ]
+}
+
+// Auditoría del logical server hacia Log Analytics (Azure Monitor).
+resource auditingSettings 'Microsoft.Sql/servers/auditingSettings@2023-08-01' = {
+  parent: sqlServer
+  name: 'default'
+  properties: {
+    state: 'Enabled'
+    isAzureMonitorTargetEnabled: true
+  }
+}
+
 module privateEndpoint 'modules/private-endpoint.bicep' = {
   name: '${sqlServerName}-pe-deploy'
   params: {
