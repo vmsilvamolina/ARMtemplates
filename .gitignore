@@ -1,0 +1,10 @@
+# Bicep / ARM build output
+/out/
+*.arm.json
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+*.swp
