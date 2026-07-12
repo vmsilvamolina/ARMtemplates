@@ -1,0 +1,23 @@
+name: Bicep Build
+
+on:
+  push:
+    paths:
+      - 'bicep/**'
+  pull_request:
+    paths:
+      - 'bicep/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build all bicep files
+        run: |
+          set -e
+          for f in bicep/*.bicep; do
+            echo "Building $f"
+            az bicep build --file "$f"
+          done
