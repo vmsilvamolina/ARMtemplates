@@ -1,0 +1,28 @@
+name: Security Scan (PSRule.Rules.Azure)
+
+on:
+  push:
+    paths:
+      - 'bicep/**'
+  pull_request:
+    paths:
+      - 'bicep/**'
+
+jobs:
+  psrule:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run PSRule analysis
+        uses: microsoft/ps-rule@v2.9.0
+        with:
+          modules: 'PSRule.Rules.Azure'
+          inputPath: 'bicep/'
+          outputFormat: Sarif
+          outputPath: reports/psrule-results.sarif
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/psrule-results.sarif
