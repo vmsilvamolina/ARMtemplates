@@ -31,3 +31,13 @@ Los ARM JSON originales quedan en la raíz del repo como referencia histórica.
 ```powershell
 ./PowerShellDeployExample.ps1
 ```
+
+## Seguridad
+
+Cada template resuelve un anti-patrón puntual del original:
+
+| Template | Antes (ARM) | Ahora (Bicep) |
+| --- | --- | --- |
+| webapp-redis | Redis key y connection string embebidos en `appsettings` | Key Vault + `SystemAssigned` managed identity + RBAC (`Key Vault Secrets User`) |
+| webapp-frontdoor | Origin accesible directo, bypassing Front Door | `ipSecurityRestrictions` + validación de header `X-Azure-FDID`, WAF en modo Prevention |
+| jenkins | NSG abierta a `Internet` en SSH/HTTP, password auth | NSG restringida a CIDR conocido, `disablePasswordAuthentication: true` |
