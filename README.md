@@ -1,5 +1,8 @@
 # ARMtemplates
 
+![Bicep Build](https://github.com/vmsilvamolina/ARMtemplates/actions/workflows/bicep-build.yml/badge.svg)
+![Security Scan](https://github.com/vmsilvamolina/ARMtemplates/actions/workflows/security-scan.yml/badge.svg)
+
 Ejemplos de infraestructura Azure, migrados de ARM JSON a Bicep.
 
 Originalmente un grab-bag de templates ARM (2018-2019). Retomado en 2026 para
