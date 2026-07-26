@@ -44,3 +44,7 @@ Cada template resuelve un anti-patrón puntual del original:
 | webapp-redis | Redis key y connection string embebidos en `appsettings` | Key Vault + `SystemAssigned` managed identity + RBAC (`Key Vault Secrets User`) |
 | webapp-frontdoor | Origin accesible directo, bypassing Front Door | `ipSecurityRestrictions` + validación de header `X-Azure-FDID`, WAF en modo Prevention |
 | jenkins | NSG abierta a `Internet` en SSH/HTTP, password auth | NSG restringida a CIDR conocido, `disablePasswordAuthentication: true` |
+
+### Companion IaC: Azure Firewall vs NSGs
+
+`bicep/firewall-hub-spoke.bicep` es el IaC del post [Azure Firewall vs NSGs: A Defense-in-Depth Security Model](https://blog.victorsilva.com.uy/azure-firewall-vs-nsg-hub-and-spoke/) — hub VNet con Azure Firewall, spoke peereado, y UDR forzando todo el egress del spoke a través del firewall. Sin esa ruta, el spoke sale directo a Internet y el firewall no ve nada.
