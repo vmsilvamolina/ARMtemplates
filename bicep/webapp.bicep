@@ -8,6 +8,9 @@ param sku string = 'S1'
 @description('Ubicación de los recursos')
 param location string = resourceGroup().location
 
+@description('Resource ID del Log Analytics workspace (opcional, vacío = sin diagnostics)')
+param logAnalyticsWorkspaceId string = ''
+
 var webAppPortalName = '${webAppName}-webapp'
 var appServicePlanName = 'AppServicePlan-${webAppName}'
 
@@ -31,6 +34,30 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
       minTlsVersion: '1.2'
       ftpsState: 'FtpsOnly'
     }
+  }
+}
+
+resource webAppDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+  name: '${webAppPortalName}-diagnostics'
+  scope: webApp
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'AppServiceHTTPLogs'
+        enabled: true
+      }
+      {
+        category: 'AppServiceConsoleLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
   }
 }
 

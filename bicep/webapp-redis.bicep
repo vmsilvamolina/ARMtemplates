@@ -11,6 +11,9 @@ param redisSku string = 'Standard'
 
 param redisCapacity int = 1
 
+@description('Resource ID del Log Analytics workspace (opcional, vacío = sin diagnostics)')
+param logAnalyticsWorkspaceId string = ''
+
 var appServicePlanName = 'AppServicePlan-${appName}'
 var webAppName = '${appName}-webapp'
 var redisName = '${appName}-redis'
@@ -95,6 +98,20 @@ resource kvSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' 
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
     principalId: webApp.identity.principalId
     principalType: 'ServicePrincipal'
+  }
+}
+
+resource redisDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+  name: '${redisName}-diagnostics'
+  scope: redisCache
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
   }
 }
 

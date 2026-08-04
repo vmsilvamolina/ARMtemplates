@@ -18,6 +18,9 @@ param dnsPrefix string = vmName
 
 param location string = resourceGroup().location
 
+@description('Resource ID del Log Analytics workspace (opcional, vacío = sin diagnostics)')
+param logAnalyticsWorkspaceId string = ''
+
 var vnetName = '${vmName}-vnet'
 var subnetName = '${vmName}-subnet'
 var nsgName = '${vmName}-nsg'
@@ -181,6 +184,24 @@ resource jenkinsInstall 'Microsoft.Compute/virtualMachines/extensions@2023-09-01
       ]
       commandToExecute: './install-jenkins.sh'
     }
+  }
+}
+
+resource nsgDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
+  name: '${nsgName}-diagnostics'
+  scope: nsg
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'NetworkSecurityGroupEvent'
+        enabled: true
+      }
+      {
+        category: 'NetworkSecurityGroupRuleCounter'
+        enabled: true
+      }
+    ]
   }
 }
 
