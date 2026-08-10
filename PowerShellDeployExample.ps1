@@ -6,28 +6,30 @@ $rg = "myappinfra-rg"
 $location = "westeurope"
 New-AzResourceGroup -Name $rg -Location $location -Force
 
+# Cada template tiene un archivo de parámetros de ejemplo en bicep/<template>.bicepparam.
+# Editar esos archivos (nombres, CIDRs, resource IDs) antes de desplegar.
+
 # Baseline: App Service Plan + Web App
 New-AzResourceGroupDeployment `
   -ResourceGroupName $rg `
   -TemplateFile ".\bicep\webapp.bicep" `
-  -webAppName "myapp"
+  -TemplateParameterFile ".\bicep\webapp.bicepparam"
 
 # Web App + Redis, secretos vía Key Vault + managed identity
 New-AzResourceGroupDeployment `
   -ResourceGroupName $rg `
   -TemplateFile ".\bicep\webapp-redis.bicep" `
-  -appName "myapp"
+  -TemplateParameterFile ".\bicep\webapp-redis.bicepparam"
 
 # Web App detrás de Front Door Premium + WAF, origin lock-down
 New-AzResourceGroupDeployment `
   -ResourceGroupName $rg `
   -TemplateFile ".\bicep\webapp-frontdoor.bicep" `
-  -appName "myapp" `
-  -frontDoorEndpointPrefix "myapp-afd"
+  -TemplateParameterFile ".\bicep\webapp-frontdoor.bicepparam"
 
-# Jenkins VM hardened: SSH key only, NSG restringida a tu IP
+# Jenkins VM hardened: SSH key only, NSG restringida a tu IP.
+# Setear adminSshPublicKey y allowedSshSourceCidr en jenkins.bicepparam primero.
 New-AzResourceGroupDeployment `
   -ResourceGroupName $rg `
   -TemplateFile ".\bicep\jenkins.bicep" `
-  -adminSshPublicKey (Get-Content "$HOME\.ssh\id_rsa.pub" -Raw) `
-  -allowedSshSourceCidr "<publicIP>/32"
+  -TemplateParameterFile ".\bicep\jenkins.bicepparam"
