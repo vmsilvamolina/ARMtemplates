@@ -17,7 +17,15 @@ jobs:
       - name: Build all bicep files
         run: |
           set -e
-          for f in bicep/*.bicep; do
+          for f in bicep/*.bicep bicep/modules/*.bicep; do
             echo "Building $f"
             az bicep build --file "$f"
+          done
+
+      - name: Build all bicepparam files
+        run: |
+          set -e
+          for f in bicep/*.bicepparam; do
+            echo "Building $f"
+            az bicep build-params --file "$f"
           done
