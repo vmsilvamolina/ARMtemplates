@@ -19,9 +19,12 @@
 - `bicep/storage-private.bicep` y `bicep/sql-private.bicep` — recursos sin acceso público, solo private endpoint.
 - `bicep/firewall-hub-spoke.bicep` — companion IaC del post "Azure Firewall vs NSGs".
 - `bicep/aks-baseline.bicep` — AKS privado con Entra ID + Azure RBAC.
+- `bicep/*.bicepparam` — archivo de parámetros de ejemplo por template, usado por `PowerShellDeployExample.ps1`.
+
+### Fixed
+
+- `bicep-build.yml`: el workflow ahora también buildea `bicep/modules/*.bicep` y valida los `*.bicepparam`.
 
 ### Kept
 
 - ARM JSON originales, como referencia histórica.
-En el mismo commit, en README.md, cambiar la línea de "Estado":
-🚧 Migración en curso. Ver [CHANGELOG](./CHANGELOG.md).

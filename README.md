@@ -12,7 +12,10 @@ restringidas en vez de abiertas a Internet.
 
 ## Estado
 
-🚧 Migración en curso.
+Migración de ARM JSON a Bicep completa para los cuatro patrones originales
+(`webapp`, `webapp-redis`, `webapp-frontdoor`, `jenkins`). El repo sigue
+creciendo con patrones nuevos de networking, datos y AKS. Ver
+[CHANGELOG](./CHANGELOG.md).
 
 ## Arquitectura
 
@@ -41,6 +44,10 @@ Los ARM JSON originales quedan en la raíz del repo como referencia histórica.
 Los templates existentes (`webapp`, `webapp-redis`, `jenkins`) ahora aceptan un parámetro opcional `logAnalyticsWorkspaceId` para mandar sus logs/métricas al mismo workspace.
 
 ## Deploy
+
+Cada template tiene un archivo de parámetros de ejemplo en
+`bicep/<template>.bicepparam` (nombres, CIDRs y resource IDs de placeholder).
+Editarlos antes de desplegar y después correr:
 
 ```powershell
 ./PowerShellDeployExample.ps1
