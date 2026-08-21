@@ -1,3 +1,5 @@
+import { logsEnabled } from 'modules/diagnostics.bicep'
+
 @description('Nombre de la VM (prefijo de otros recursos)')
 param vmName string = 'vm-jenkins'
 
@@ -192,16 +194,10 @@ resource nsgDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-previe
   scope: nsg
   properties: {
     workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'NetworkSecurityGroupEvent'
-        enabled: true
-      }
-      {
-        category: 'NetworkSecurityGroupRuleCounter'
-        enabled: true
-      }
-    ]
+    logs: logsEnabled([
+      'NetworkSecurityGroupEvent'
+      'NetworkSecurityGroupRuleCounter'
+    ])
   }
 }
 

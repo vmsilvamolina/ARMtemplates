@@ -1,3 +1,5 @@
+import { allMetrics, logsEnabled } from 'modules/diagnostics.bicep'
+
 @minLength(3)
 param clusterName string
 
@@ -60,22 +62,11 @@ resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' 
   scope: aks
   properties: {
     workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'kube-audit'
-        enabled: true
-      }
-      {
-        category: 'kube-apiserver'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
+    logs: logsEnabled([
+      'kube-audit'
+      'kube-apiserver'
+    ])
+    metrics: allMetrics
   }
 }
 

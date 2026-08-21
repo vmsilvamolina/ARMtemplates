@@ -1,3 +1,5 @@
+import { allMetrics, logsEnabled } from 'modules/diagnostics.bicep'
+
 @minLength(2)
 @description('Nombre base del recurso webapp')
 param webAppName string
@@ -42,22 +44,11 @@ resource webAppDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
   scope: webApp
   properties: {
     workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'AppServiceHTTPLogs'
-        enabled: true
-      }
-      {
-        category: 'AppServiceConsoleLogs'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
+    logs: logsEnabled([
+      'AppServiceHTTPLogs'
+      'AppServiceConsoleLogs'
+    ])
+    metrics: allMetrics
   }
 }
 
