@@ -1,3 +1,5 @@
+import { allMetrics } from 'modules/diagnostics.bicep'
+
 @minLength(2)
 param appName string
 
@@ -41,26 +43,28 @@ resource redisCache 'Microsoft.Cache/redis@2023-08-01' = {
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: keyVaultName
-  location: location
-  properties: {
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
-    tenantId: subscription().tenantId
-    enableRbacAuthorization: true
-    enableSoftDelete: true
+module keyVault 'modules/key-vault.bicep' = {
+  name: '${appName}-kv-deploy'
+  params: {
+    keyVaultName: keyVaultName
+    location: location
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
 }
 
+resource keyVaultExisting 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+
 resource redisSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: keyVault
+  parent: keyVaultExisting
   name: 'redis-primary-key'
   properties: {
     value: redisCache.listKeys().primaryKey
   }
+  dependsOn: [
+    keyVault
+  ]
 }
 
 resource webApp 'Microsoft.Web/sites@2023-12-01' = {
@@ -92,13 +96,16 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
 }
 
 resource kvSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault.id, webApp.id, 'KeyVaultSecretsUser')
-  scope: keyVault
+  name: guid(keyVaultExisting.id, webApp.id, 'KeyVaultSecretsUser')
+  scope: keyVaultExisting
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
     principalId: webApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
+  dependsOn: [
+    keyVault
+  ]
 }
 
 resource redisDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
@@ -106,14 +113,9 @@ resource redisDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-prev
   scope: redisCache
   properties: {
     workspaceId: logAnalyticsWorkspaceId
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
+    metrics: allMetrics
   }
 }
 
 output webAppHostName string = webApp.properties.defaultHostName
-output keyVaultUri string = keyVault.properties.vaultUri
+output keyVaultUri string = keyVault.outputs.keyVaultUri
