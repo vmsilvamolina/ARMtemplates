@@ -6,6 +6,7 @@
 
 - Migración completa de ARM JSON a Bicep para los 4 templates del repo.
 - `webapp-redis`: reemplazo de claves en texto plano por Key Vault + managed identity.
+- `webapp-redis`: el Key Vault inline se reemplaza por el módulo `key-vault.bicep` (agrega `softDeleteRetentionInDays`, purge protection y diagnostics del vault).
 - `webapp-frontdoor`: migración de Front Door classic a Front Door Premium + WAF, origin lock-down.
 - `jenkins`: NSG restringida, autenticación solo por SSH key, sin dependencias de marketplace externo.
 - `webapp.bicep`, `webapp-redis.bicep`, `jenkins.bicep` ahora aceptan `logAnalyticsWorkspaceId` opcional para diagnostics.
@@ -18,6 +19,7 @@
 - `bicepconfig.json` con analyzers de seguridad habilitados.
 - `bicep/modules/log-analytics.bicep` y `bicep/modules/private-endpoint.bicep` — módulos reusables.
 - `bicep/modules/diagnostics.bicep` — tipo `diagnosticCategory` y función `logsEnabled` compartidos vía `import` de compile-time.
+- `bicep/modules/key-vault.bicep` — módulo reusable de Key Vault hardened (RBAC-only, soft-delete + purge protection, firewall en Deny), consumido por `webapp-redis`.
 - `bicep/storage-private.bicep` y `bicep/sql-private.bicep` — recursos sin acceso público, solo private endpoint.
 - `bicep/firewall-hub-spoke.bicep` — companion IaC del post "Azure Firewall vs NSGs".
 - `bicep/aks-baseline.bicep` — AKS privado con Entra ID + Azure RBAC.

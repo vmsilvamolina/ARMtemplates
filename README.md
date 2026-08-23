@@ -37,6 +37,7 @@ Los ARM JSON originales quedan en la raíz del repo como referencia histórica.
 - **`bicep/modules/log-analytics.bicep`** — módulo reusable: Log Analytics workspace para diagnostics.
 - **`bicep/modules/private-endpoint.bicep`** — módulo reusable: private endpoint + private DNS zone, usado por storage y SQL.
 - **`bicep/modules/diagnostics.bicep`** — helpers compartidos (tipo + función) para diagnostic settings, importados en compile-time por los templates.
+- **`bicep/modules/key-vault.bicep`** — módulo reusable: Key Vault RBAC-only, soft-delete + purge protection, firewall en Deny, diagnostics opcional. Usado por `webapp-redis`.
 - **`bicep/storage-private.bicep`** — Storage Account sin acceso público, solo vía private endpoint.
 - **`bicep/sql-private.bicep`** — Azure SQL con Azure AD-only auth (sin SQL login) + private endpoint. Reemplaza el patrón de connection string en texto plano del `webapp-redis.json` original.
 - **`bicep/firewall-hub-spoke.bicep`** — hub-spoke con Azure Firewall, companion IaC del post de Azure Firewall vs NSGs (ver sección Seguridad).
