@@ -2,6 +2,7 @@
 
 ![Bicep Build](https://github.com/vmsilvamolina/ARMtemplates/actions/workflows/bicep-build.yml/badge.svg)
 ![Security Scan](https://github.com/vmsilvamolina/ARMtemplates/actions/workflows/security-scan.yml/badge.svg)
+![Bicep What-If](https://github.com/vmsilvamolina/ARMtemplates/actions/workflows/bicep-whatif.yml/badge.svg)
 
 Ejemplos de infraestructura Azure, migrados de ARM JSON a Bicep.
 
@@ -54,6 +55,44 @@ Editarlos antes de desplegar y después correr:
 ```powershell
 ./PowerShellDeployExample.ps1
 ```
+
+## CI
+
+Tres workflows corren sobre cambios en `bicep/**`:
+
+- **Bicep Build** — `az bicep build` de cada template y módulo, `build-params` de
+  cada `*.bicepparam`.
+- **Security Scan** — PSRule.Rules.Azure, resultado a SARIF / code scanning.
+- **Bicep What-If** — `az deployment group what-if` de cada template contra un
+  resource group real, autenticando por OIDC (sin secretos). El resultado queda
+  en el Step Summary del PR.
+
+### Configurar el What-If (OIDC)
+
+El workflow corre solo si están definidas estas *Variables* del repo
+(Settings > Secrets and variables > Actions > Variables): `AZURE_CLIENT_ID`,
+`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`.
+
+```bash
+az ad app create --display-name armtemplates-ci
+appId=$(az ad app list --display-name armtemplates-ci --query '[0].appId' -o tsv)
+az ad sp create --id "$appId"
+
+az ad app federated-credential create --id "$appId" --parameters '{
+  "name": "armtemplates-pr",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:vmsilvamolina/ARMtemplates:pull_request",
+  "audiences": ["api://AzureADTokenExchange"]
+}'
+
+# what-if necesita el data action Microsoft.Resources/deployments/whatIf/action
+az role assignment create --assignee "$appId" --role Contributor \
+  --scope /subscriptions/<sub>/resourceGroups/<rg-de-validacion>
+```
+
+Los `*.bicepparam` de ejemplo tienen resource IDs placeholder, así que algunos
+what-if fallan hasta apuntarlos a recursos reales. El job reporta pero no
+bloquea el PR.
 
 ## Seguridad
 
