@@ -16,6 +16,7 @@
 
 - `bicep/` con los 4 templates migrados.
 - `.github/workflows/` con build y security scan (PSRule.Rules.Azure).
+- `.github/workflows/bicep-whatif.yml` — `az deployment group what-if` de cada template contra un RG real, auth por OIDC (sin secretos), resultado en el Step Summary del PR.
 - `bicepconfig.json` con analyzers de seguridad habilitados.
 - `bicep/modules/log-analytics.bicep` y `bicep/modules/private-endpoint.bicep` — módulos reusables.
 - `bicep/modules/diagnostics.bicep` — tipo `diagnosticCategory` y función `logsEnabled` compartidos vía `import` de compile-time.

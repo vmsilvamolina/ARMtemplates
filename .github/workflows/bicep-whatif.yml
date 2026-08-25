@@ -1,0 +1,70 @@
+name: Bicep What-If
+
+on:
+  pull_request:
+    paths:
+      - 'bicep/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: whatif-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  whatif:
+    runs-on: ubuntu-latest
+    # Corre solo si el repo tiene configuradas las variables de OIDC en
+    # Settings > Secrets and variables > Actions > Variables:
+    #   AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
+    if: vars.AZURE_CLIENT_ID != ''
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Azure login (OIDC, sin secretos)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: What-If por template
+        shell: bash
+        env:
+          RG: ${{ vars.AZURE_RESOURCE_GROUP }}
+        run: |
+          set -uo pipefail
+          echo "## Bicep What-If (\`$RG\`)" >> "$GITHUB_STEP_SUMMARY"
+          failed=0
+          for param in bicep/*.bicepparam; do
+            tpl="${param%.bicepparam}.bicep"
+            echo "::group::what-if $tpl"
+            if out=$(az deployment group what-if \
+                --resource-group "$RG" \
+                --template-file "$tpl" \
+                --parameters "$param" \
+                --no-pretty-print 2>&1); then
+              status="ok"
+            else
+              status="ERROR"
+              failed=1
+            fi
+            echo "$out"
+            echo "::endgroup::"
+            {
+              echo "<details><summary><code>$tpl</code> — $status</summary>"
+              echo
+              echo '```'
+              echo "$out"
+              echo '```'
+              echo "</details>"
+            } >> "$GITHUB_STEP_SUMMARY"
+          done
+          # Informativo: los *.bicepparam de ejemplo tienen resource IDs placeholder,
+          # así que algunos what-if fallan hasta que se apunten a recursos reales.
+          # El job no bloquea el PR; quitar la línea de abajo para hacerlo bloqueante.
+          if [ "$failed" = 1 ]; then
+            echo "::warning::what-if falló para algún template (¿params placeholder?)"
+          fi
