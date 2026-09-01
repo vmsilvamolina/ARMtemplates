@@ -29,12 +29,19 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   name: webAppPortalName
   location: location
   kind: 'app'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
+    clientAffinityEnabled: false
     siteConfig: {
       minTlsVersion: '1.2'
       ftpsState: 'FtpsOnly'
+      alwaysOn: true
+      http20Enabled: true
+      healthCheckPath: '/health'
     }
   }
 }

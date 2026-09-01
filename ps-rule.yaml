@@ -1,0 +1,64 @@
+#
+# PSRule for Azure — configuración del repo
+# https://azure.github.io/PSRule.Rules.Azure/setup/configuring-options/
+#
+# Los templates de bicep/ son material de demostración que acompaña a los
+# posts del blog: ilustran una práctica concreta (aislamiento de red,
+# identidad administrada, secretos en Key Vault, hub-spoke con firewall)
+# con el mínimo de recursos para desplegar. Por eso se excluyen reglas de
+# costo / alta disponibilidad de tier y de gobernanza de tags, que no son
+# el punto de cada template. Todo lo relacionado con la postura de
+# seguridad real (auditoría, TLS, RBAC, cifrado, endpoints privados) se
+# corrige en los .bicep en vez de suprimirse.
+#
+
+configuration:
+  # Evaluar cada .bicepparam de ejemplo (referencia su .bicep). Todos los
+  # templates tienen uno, así que la cobertura es completa. No se expande el
+  # .bicep suelto porque algunos exigen parámetros sin default.
+  AZURE_BICEP_PARAMS_FILE_EXPANSION: true
+  AZURE_BICEP_FILE_EXPANSION_TIMEOUT: 30
+
+input:
+  pathIgnore:
+    # Los módulos se evalúan a través de los templates que los consumen
+    # (bicep compila el módulo dentro del template). Escanearlos sueltos,
+    # sin parámetros, solo genera ruido.
+    - 'bicep/modules/**'
+    # ARM JSON original: se conserva como referencia histórica, no se evalúa.
+    - '**/*.json'
+
+rule:
+  exclude:
+    # --- Costo / tier de alta disponibilidad: los templates despliegan lo mínimo ---
+    - Azure.AppService.PlanInstanceCount   # el plan de ejemplo corre 1 instancia
+    - Azure.AppService.AvailabilityZone
+    - Azure.PublicIP.AvailabilityZone
+    - Azure.Firewall.AvailabilityZone
+    - Azure.VM.MaintenanceConfig
+    - Azure.VM.Standalone                  # 1 sola VM Jenkins de demo
+
+    # --- Gobernanza de tags: fuera del alcance de estos templates ---
+    - Azure.Resource.UseTags
+
+    # --- Jenkins: expone IP pública a propósito, restringida por NSG + CIDR param ---
+    - Azure.VM.PublicIPAttached
+
+    # --- Agente de monitoreo de VM: los diagnostics del repo son opt-in ---
+    - Azure.VM.AMA
+
+    # --- webapp-redis: el template trata la rotación de la access key vía
+    #     Key Vault; el aislamiento de red de Redis y la migración a auth por
+    #     Entra ID son el tema de otro post ---
+    - Azure.Redis.PublicNetworkAccess
+    - Azure.Redis.FirewallRuleCount
+    - Azure.Redis.FirewallIPRange
+    - Azure.Redis.LocalAuth
+    - Azure.Redis.EntraID
+    - Azure.Redis.MigrateAMR
+    - Azure.Redis.MaxMemoryReserved
+
+    # --- Diagnostics como opt-in vía parámetro logAnalyticsWorkspaceId:
+    #     PSRule no ve el workspace en los .bicepparam de ejemplo ---
+    - Azure.KeyVault.Logs
+    - Azure.FrontDoor.Logs

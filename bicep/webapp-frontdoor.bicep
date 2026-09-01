@@ -30,6 +30,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-05-01' = {
   name: frontDoorProfileName
   location: 'global'
+  identity: {
+    type: 'SystemAssigned'
+  }
   sku: {
     name: frontDoorSku
   }
@@ -39,11 +42,19 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   name: appName
   location: location
   kind: 'app'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
+    clientAffinityEnabled: false
     siteConfig: {
       minTlsVersion: '1.2'
+      ftpsState: 'FtpsOnly'
+      alwaysOn: true
+      http20Enabled: true
+      healthCheckPath: '/health'
       ipSecurityRestrictionsDefaultAction: 'Deny'
       ipSecurityRestrictions: [
         {

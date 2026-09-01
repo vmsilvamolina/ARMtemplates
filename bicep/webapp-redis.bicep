@@ -81,6 +81,9 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
     siteConfig: {
       minTlsVersion: '1.2'
       ftpsState: 'FtpsOnly'
+      alwaysOn: true
+      http20Enabled: true
+      healthCheckPath: '/health'
       appSettings: [
         {
           name: 'Redis__InstanceName'

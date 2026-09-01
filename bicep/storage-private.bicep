@@ -15,14 +15,30 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   location: location
   kind: 'StorageV2'
   sku: {
-    name: 'Standard_LRS'
+    name: 'Standard_ZRS'
   }
   properties: {
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       defaultAction: 'Deny'
+    }
+  }
+}
+
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
+    containerDeleteRetentionPolicy: {
+      enabled: true
+      days: 7
     }
   }
 }

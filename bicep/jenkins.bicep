@@ -74,6 +74,23 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           destinationPortRange: '443'
         }
       }
+      {
+        // Frena el movimiento lateral: nada de SSH/RDP saliente hacia otras VMs.
+        name: 'deny-outbound-management-to-vnet'
+        properties: {
+          access: 'Deny'
+          direction: 'Outbound'
+          priority: 200
+          protocol: '*'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'VirtualNetwork'
+          destinationPortRanges: [
+            '22'
+            '3389'
+          ]
+        }
+      }
     ]
   }
 }
@@ -92,6 +109,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
         name: subnetName
         properties: {
           addressPrefix: '172.16.0.0/24'
+          defaultOutboundAccess: false
           networkSecurityGroup: {
             id: nsg.id
           }
@@ -156,6 +174,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       }
       osDisk: {
         createOption: 'FromImage'
+        caching: 'ReadWrite'
         managedDisk: {
           storageAccountType: 'Standard_LRS'
         }
