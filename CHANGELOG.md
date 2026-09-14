@@ -11,6 +11,12 @@
 - `jenkins`: NSG restringida, autenticación solo por SSH key, sin dependencias de marketplace externo.
 - `webapp.bicep`, `webapp-redis.bicep`, `jenkins.bicep` ahora aceptan `logAnalyticsWorkspaceId` opcional para diagnostics.
 - `webapp`, `jenkins`, `aks-baseline`: los diagnostic settings arman sus listas de categorías con `logsEnabled(...)` / `allMetrics` importados de `modules/diagnostics.bicep` en vez de repetir los bloques inline.
+- `sql-private`: Microsoft Defender for SQL + vulnerability assessment (sin storage account) + auditing hacia Azure Monitor.
+- `storage-private`: SKU `Standard_ZRS`, `allowSharedKeyAccess: false`, soft-delete de blobs y contenedores (7 días).
+- `webapp`, `webapp-frontdoor`: managed identity `SystemAssigned`, `clientAffinityEnabled: false`, `alwaysOn`, `http20Enabled`, `healthCheckPath: /health`.
+- `webapp-redis`: `alwaysOn`, `http20Enabled`, `healthCheckPath: /health`.
+- `jenkins`: regla NSG que deniega salida SSH/RDP hacia el resto de la VNet (anti movimiento lateral), `defaultOutboundAccess: false` en la subnet, `caching: ReadWrite` en el disco.
+- `ps-rule.yaml`: config de PSRule.Rules.Azure — excluye reglas de costo/tier/tags fuera del alcance de estos templates de demo; documenta el criterio en el propio archivo.
 
 ### Added
 

@@ -63,6 +63,10 @@ Tres workflows corren sobre cambios en `bicep/**`:
 - **Bicep Build** — `az bicep build` de cada template y módulo, `build-params` de
   cada `*.bicepparam`.
 - **Security Scan** — PSRule.Rules.Azure, resultado a SARIF / code scanning.
+  Configuración en `ps-rule.yaml`: excluye reglas de costo, tier de alta
+  disponibilidad y gobernanza de tags (fuera del alcance de estos templates de
+  demo); todo lo relacionado a postura de seguridad real (auditoría, TLS, RBAC,
+  cifrado, endpoints privados) se corrige en los `.bicep`, no se suprime.
 - **Bicep What-If** — `az deployment group what-if` de cada template contra un
   resource group real, autenticando por OIDC (sin secretos). El resultado queda
   en el Step Summary del PR.
