@@ -17,6 +17,7 @@
 - `webapp-redis`: `alwaysOn`, `http20Enabled`, `healthCheckPath: /health`.
 - `jenkins`: regla NSG que deniega salida SSH/RDP hacia el resto de la VNet (anti movimiento lateral), `defaultOutboundAccess: false` en la subnet, `caching: ReadWrite` en el disco.
 - `ps-rule.yaml`: config de PSRule.Rules.Azure — excluye reglas de costo/tier/tags fuera del alcance de estos templates de demo; documenta el criterio en el propio archivo.
+- `ps-rule.yaml`: excluye `Azure.ACR.GeoReplica` (requiere un segundo registry Premium).
 
 ### Added
 
@@ -30,6 +31,8 @@
 - `bicep/storage-private.bicep` y `bicep/sql-private.bicep` — recursos sin acceso público, solo private endpoint.
 - `bicep/firewall-hub-spoke.bicep` — companion IaC del post "Azure Firewall vs NSGs".
 - `bicep/aks-baseline.bicep` — AKS privado con Entra ID + Azure RBAC.
+- `bicep/container-apps-private.bicep` — Container Apps en environment interno + ACR Premium privado, pull por user-assigned managed identity, ingress restringido por CIDR.
+- `bicep/modules/private-dns-wildcard.bicep` — private DNS zone con wildcard a IP privada, para dominios conocidos recién en runtime.
 - `bicep/*.bicepparam` — archivo de parámetros de ejemplo por template, usado por `PowerShellDeployExample.ps1`.
 
 ### Fixed

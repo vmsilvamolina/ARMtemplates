@@ -37,6 +37,7 @@ rule:
     - Azure.Firewall.AvailabilityZone
     - Azure.VM.MaintenanceConfig
     - Azure.VM.Standalone                  # 1 sola VM Jenkins de demo
+    - Azure.ACR.GeoReplica                 # requiere un segundo registry Premium
 
     # --- Gobernanza de tags: fuera del alcance de estos templates ---
     - Azure.Resource.UseTags

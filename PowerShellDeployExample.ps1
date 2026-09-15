@@ -33,3 +33,10 @@ New-AzResourceGroupDeployment `
   -ResourceGroupName $rg `
   -TemplateFile ".\bicep\jenkins.bicep" `
   -TemplateParameterFile ".\bicep\jenkins.bicepparam"
+
+# Container Apps en environment interno + ACR privado, pull por managed identity.
+# Requiere una subnet delegada a Microsoft.App/environments (/27 o mayor) y otra para el private endpoint.
+New-AzResourceGroupDeployment `
+  -ResourceGroupName $rg `
+  -TemplateFile ".\bicep\container-apps-private.bicep" `
+  -TemplateParameterFile ".\bicep\container-apps-private.bicepparam"
